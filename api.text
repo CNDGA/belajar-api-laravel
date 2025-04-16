@@ -1,0 +1,3 @@
+ 
+ //membuat controller
+ php artisan make:controller Api/AuthController
