@@ -1,0 +1,34 @@
+public function attendanceIn(Request $request)
+    {
+        //radius
+
+        $lat_from_employee = $request->lat_from_employee;
+        $long_from_employee = $request->long_from_employee;
+        $lat_from_office = $request->lat_from_office;
+        $long_from_office = $request->long_from_office;
+        $radius = $this->getDistanceBetweenPoints($lat_from_employee, $long_from_employee, $lat_from_office,  $long_from_office);
+        $meter = round($radius['meters']);
+        // $meter = $meter / 1000;
+        // return $meter;
+
+
+        //jika radiusnya lebih dari 100
+        //ini kondisi
+        if ($meter > 100) {
+            return response()->json(['message' => 'Upss Redius out of range']);
+        }
+    }
+
+    protected function getDistanceBetweenPoints($lat1, $lon1, $lat2, $lon2)
+    {
+        $theta = $lon1 - $lon2;
+        $miles = (sin(deg2rad($lat1)) * sin(deg2rad($lat2))) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
+        $miles = acos($miles);
+        $miles = rad2deg($miles);
+        $miles = $miles * 60 * 1.1515;
+        $feet  = $miles * 5280;
+        $yards = $feet / 3;
+        $kilometers = $miles * 1.609344;
+        $meters = $kilometers * 1000;
+        return compact('miles', 'feet', 'yards', 'kilometers', 'meters');
+    }

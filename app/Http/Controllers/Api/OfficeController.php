@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employees;
+use App\Models\Offices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use PhpParser\Node\Expr\Cast;
 
-class EmployeeController extends Controller
+class OfficeController extends Controller
 {
     public function index()
     {
         try {
-            $employees = Employees::orderBy('id', 'desc')->get();
+            $employees = Offices::orderBy('id', 'desc')->get();
             return response()->json(['success' => true, 'data' => $employees]);
         } catch (\Throwable $th) {
             Log::error('Failed to fetch data employees : ' . $th->getMessage());
@@ -28,8 +28,9 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'phone' => 'required',
+            'office_name' => 'required',
+            'office_lat' => 'required',
+            'office_long' => 'required',
         ]);
 
         if ($validate->fails()) {
@@ -40,17 +41,18 @@ class EmployeeController extends Controller
         }
         try {
 
-            $employees = Employees::create([
-                'user_id' => $request->user_id,
-                'phone' => $request->phone,
-                'address' => $request->address,
+            $offices = Offices::create([
+                'office_name' => $request->office_name,
+                'office_phone' => $request->office_phone,
+                'office_address' => $request->office_address,
+                'office_lat' => $request->office_lat,
+                'office_long' => $request->office_long,
                 'is_active' => $request->is_active,
-                'gender' => $request->gender,
             ]);
-            return response()->json(['success' =>  true, 'message' => 'Employees added success', 'data' => $employees]);
+            return response()->json(['success' =>  true, 'message' => 'Offices added success', 'data' => $offices]);
         } catch (\Throwable $th) {
             Log::error('failed insert : ' . $th->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed Create Employees'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed Create offices'], 500);
             //throw $th;
         }
     }
@@ -59,9 +61,8 @@ class EmployeeController extends Controller
     public function show($id)
     {
         try {
-            //with menunjukan relasi user $id
-            $employee = Employees::with('user')->findOrFail($id);
-            return response()->json(['success' => true, 'message' => 'Show Data Success', 'Data' => $employee]);
+            $offices = Offices::findOrFail($id);
+            return response()->json(['success' => true, 'message' => 'Show Data Success', 'Data' => $offices]);
         } catch (\Throwable $th) {
             Log::error('Failed Show : ' . $th->getMessage());
             return response()->json([
@@ -74,8 +75,9 @@ class EmployeeController extends Controller
     public function update(Request $request, $id)
     {
         $validate = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'phone' => 'required',
+            'office_name' => 'required',
+            'offlice_lat' => 'required',
+            'offlice_long' => 'required',
         ]);
 
         if ($validate->fails()) {
@@ -86,23 +88,23 @@ class EmployeeController extends Controller
         }
         try {
 
-            $employees = Employees::findOrFail($id);
+            $offices = Offices::findOrFail($id);
 
             $data = [
-                'user_id' => $request->user_id,
-                'phone' => $request->phone,
-                'address' => $request->address,
+                'office_name' => $request->office_name,
+                'office_phone' => $request->office_phone,
+                'office_address' => $request->office_address,
+                'office_lat' => $request->office_lat,
+                'office_long' => $request->office_long,
                 'is_active' => $request->is_active,
-                'gender' => $request->gender,
-                'nip' => $request->nip
             ];
 
-            $employees->update($data);
+            $offices->update($data);
 
-            return response()->json(['success' =>  true, 'message' => 'Employees added success', 'data' => $employees]);
+            return response()->json(['success' =>  true, 'message' => 'offices added success', 'data' => $offices]);
         } catch (\Throwable $th) {
             Log::error('failed Update : ' . $th->getMessage());
-            return response()->json(['success' => false, 'message' => 'Failed Create Employees'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed Create offices'], 500);
             //throw $th;
         }
     }
@@ -110,8 +112,8 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         try {
-            $employee = Employees::find($id)->delete();
-            return response()->json(['message' => 'Employee delete success']);
+            $employee = Offices::find($id)->delete();
+            return response()->json(['message' => 'Offices delete success']);
         } catch (\Throwable $th) {
             return response()->json(['message' => $th->getMessage()], 500);
         }
